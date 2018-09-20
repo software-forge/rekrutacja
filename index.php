@@ -9,7 +9,7 @@
         exit();
     }
 
-    // ustalenie tozsamości zalogowanego usera
+    // ustalenie tożsamości zalogowanego usera
     $nick = '';
     $email = '';
 

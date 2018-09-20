@@ -30,8 +30,8 @@
                     if($message === 'invalid_email')
                         echo('<p style="color: red;">Podaj prawidłowy adres e-mail!</p>');
                     if($message === 'user_exists')
-                        echo('<p style="color: red;">Uzytkownik o takim nicku juz istnieje, wybierz inny nick.</p>');
-                    if($message === 'other_error')
+                        echo('<p style="color: red;">Użytkownik o takim nicku juz istnieje, wybierz inny nick.</p>');
+                    if($message === 'error')
                         echo('<p style="color: red;">Wystąpił błąd, skontaktuj się z administratorem.</p>');
                     if($message === 'check_inbox')
                         echo('<p style="color: green;">Wysłano e-mail z linkiem aktywacyjnym, sprawdź swoją skrzynkę pocztową.</p>');

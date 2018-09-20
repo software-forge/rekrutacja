@@ -18,22 +18,22 @@
 
     require('db_credentials.php');
 
-    $connection = mysqli_connect($db_servername, $db_username, $db_password);
+    $connection = mysqli_connect($db_servername, $db_username, $db_password, $db_name);
 
     if(!$connection)
     {
-        echo('Błąd połączenia z bazą: '.mysqli_connect_errno());
+        echo('Błąd połączenia z bazą: '.mysqli_errno($connection));
         exit();
     }
 
-    $query = 'SELECT * FROM `portal`.`users` WHERE user_id='.$user_id;
+    $query = 'SELECT * FROM `users` WHERE user_id='.$user_id;
 
     $result = mysqli_query($connection, $query);
 
     if(!$result)
     {
         mysqli_close($connection);
-        echo('Nie udało się odnaleźć uzytkownika o podanym user_id - błąd zapytania do bazy: '.mysqli_connect_errno());
+        echo('Nie udało się odnaleźć uzytkownika o podanym user_id - błąd zapytania do bazy: '.mysqli_errno($connection));
         exit();
     }
 
@@ -60,14 +60,14 @@
         2. Aktywacja konta usera
     */
 
-    $query = 'UPDATE `portal`.`users` SET `is_active` = \'1\' WHERE `users`.`user_id` = '.$user_id;
+    $query = 'UPDATE `users` SET `is_active` = \'1\' WHERE `users`.`user_id` = '.$user_id;
 
     $result = mysqli_query($connection, $query);
 
     if(!$result)
     {
         mysqli_close($connection);
-        echo('Nie udało się aktywować konta - błąd zapytania do bazy: '.mysqli_connect_errno());
+        echo('Nie udało się aktywować konta - błąd zapytania do bazy: '.mysqli_errno($connection));
         exit();
     }
 

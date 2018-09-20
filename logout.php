@@ -8,6 +8,8 @@
 
     session_unset();
 
-    header('Location: login_form.php?message=logged_out');
+	require('redirect.php');
+	
+    redirect(LOGIN_PAGE, LOGGED_OUT);
 
 ?>

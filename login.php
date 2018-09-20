@@ -4,8 +4,10 @@
          Skrypt implementujący logikę autoryzacji uzytkownika
     */
 
-    session_start();
-
+	session_start();
+	
+	require('redirect.php');
+	
     // Przekierowanie do index.php, jezeli POST-em nic nie przyszło
     if(!isset($_POST['nick']) or !isset($_POST['password']))
     {
@@ -17,34 +19,30 @@
     $pass = $_POST['password'];
 
     /*
-        1. Sprawdzenie, czy w bazie jest aktywny uzytkownik o przekazanym nicku
+        1. Sprawdzenie, czy w bazie jest aktywny użytkownik o przekazanym nicku
     */
 
     require('db_credentials.php');
 
-    $connection = mysqli_connect($db_servername, $db_username, $db_password);
+    $connection = mysqli_connect($db_servername, $db_username, $db_password, $db_name);
 
     if(!$connection)
-    {
-        header('Location: login_form.php?message=other_error');
-        exit();
-    }
+		redirect(LOGIN_PAGE, ERROR);
 
-    $query = 'SELECT * FROM `portal`.`users` WHERE nick=\''.$nick.'\'';
+    $query = 'SELECT * FROM `users` WHERE nick=\''.$nick.'\'';
 
     $result = mysqli_query($connection, $query);
 
     if(!$result)
     {
         mysqli_close($connection);
-        header('Location: login_form.php?message=other_error');
-        exit();
+        redirect(LOGIN_PAGE, ERROR);
     }
 
     $users_found = mysqli_num_rows($result);
 
-    $email;
-    $password_hash;
+    $email = '';
+    $password_hash = '';
 
     $is_active = 0;
     if($users_found == 1)
@@ -59,26 +57,19 @@
     {
         mysqli_close($connection);
 
+		// Błąd - więcej niż jeden użytkownik o takim nicku (nie powinien wystąpić)
         if($users_found > 1)
-        {
-            // Błąd - więcej niz jeden user o takim nicku (nie powinien wystąpić)
-            header('Location: login_form.php?message=other_error');
-            exit();
-        }
-
-        // User nie istnieje - odmowa dostępu
-        //echo('User nie odnaleziony'); // debug
-        header('Location: login_form.php?message=access_denied');
-        exit();
+			redirect(LOGIN_PAGE, ERROR);
+		
+        // Użytkownik o przekazanym nicku nie istnieje -> odmowa dostępu
+        redirect(LOGIN_PAGE, ACCESS_DENIED);
     }
 
     if(!$is_active)
     {
-        // konto usera nie aktywowane - odmowa dostępu
+        // Konto użytkownika nieaktywne -> odmowa dostępu
         mysqli_close($connection);
-        //echo('Konto nieaktywne'); // debug
-        header('Location: login_form.php?message=access_denied');
-        exit();
+        redirect(LOGIN_PAGE, ACCESS_DENIED);
     }
 
     mysqli_close($connection);
@@ -89,12 +80,9 @@
 
     $verify = password_verify($pass, $password_hash);
 
+	// Weryfikacja hasła negatywna -> odmowa dostępu
     if(!$verify)
-    {
-        // niepoprawne hasło - odmowa dostępu
-        header('Location: login_form.php?message=access_denied');
-        exit();
-    }
+		redirect(LOGIN_PAGE, ACCESS_DENIED);
 
     /*
         3. Zalogowanie uzytkownika

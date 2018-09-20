@@ -33,7 +33,7 @@
                         echo('<p style="color: green;">Wylogowano</p>');
                     if($message === 'access_denied')
                         echo('<p style="color: red;">Nieprawidłowe dane logowania lub konto nieaktywne.</p>');
-                    if($message === 'other_error')
+                    if($message === 'error')
                         echo('<p style="color: red;">Wystąpił błąd, skontaktuj się z administratorem.</p>');
                 ?>
         </div>

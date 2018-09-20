@@ -4,13 +4,15 @@
         Skrypt implementujący logikę dodawania nowego uzytkownika
     */
 
+	require('redirect.php');
+	
     // Przekierowanie do index.php, jezeli POST-em nic nie przyszło
     if(!isset($_POST['email']) or !isset($_POST['nick']) or !isset($_POST['password']))
     {
         header('Location: index.php');
         exit();
     }
-        
+		
     $email = $_POST['email'];
     $nick = $_POST['nick'];
     $pass = $_POST['password'];
@@ -23,26 +25,20 @@
 
     // Podany tekst nie jest poprawnym adresem e-mail -> przekierowanie do register.php
     if(!filter_var($email, FILTER_VALIDATE_EMAIL))
-    {
-        header("Location: register_form.php?message=invalid_email");
-        exit();
-    }
+		redirect(REGISTER_PAGE, INVALID_EMAIL);
     
     // Otwarcie połączenia z serwerem MySQL
     require('db_credentials.php');
 
-    $connection = mysqli_connect($db_servername, $db_username, $db_password);
+    $connection = mysqli_connect($db_servername, $db_username, $db_password, $db_name);
 
     // Obsługa błędu połączenia -> przekierowanie do register.php
     if(!$connection)
-    {
-        header('Location: register_form.php?message=other_error');
-        exit();
-    }
+		redirect(REGISTER_PAGE, ERROR);
 
     // 1.2 Walidacja nicku = sprawdzenie, czy w bazie nie ma jeszcze takiego uzytkownika
 
-    $query = 'SELECT * FROM `portal`.`users` WHERE nick = \''.$nick.'\'';
+    $query = 'SELECT * FROM `users` WHERE nick = \''.$nick.'\'';
 
     $result = mysqli_query($connection, $query);
 
@@ -50,51 +46,45 @@
     if(!$result)
     {
         mysqli_close($connection);
-        header('Location: register_form.php?message=other_error');
-        exit();
+        redirect(REGISTER_PAGE, ERROR);
     }
 
     // Taki uzytkownik juz istnieje w bazie -> przekierowanie do register.php
     if(mysqli_num_rows($result) > 0)
     {
         mysqli_close($connection);
-        header('Location: register_form.php?message=user_exists');
-        exit();
+        redirect(REGISTER_PAGE, USER_EXISTS);
     }
 
     /*
-        2. Dodanie usera
+        2. Dodanie użytkownika
     */
 
     // 2.1 Zahashowanie hasła
     $password_hash = password_hash($pass, PASSWORD_DEFAULT);
 
-    // 2.2 Dodanie rekordu usera do tabeli (na razie aktywny = false)
-    $query = 'INSERT INTO `portal`.`users` 
+    // 2.2 Dodanie rekordu usera do tabeli (na razie is_active = false)
+    $query = 'INSERT INTO `users` 
         (`user_id`,
         `nick`,
         `password_hash`,
         `email`,
         `is_active`) VALUES (NULL, \''.$nick.'\', \''.$password_hash.'\', \''.$email.'\', \'0\')';
 
-    //echo($query);
-    //exit();
-
     $result = mysqli_query($connection, $query);
 
     // Obsługa błędu zapytania -> przekierowanie do register.php
     if(!$result)
     {
         mysqli_close($connection);
-        header('Location: register_form.php?message=other_error');
-        exit();
+        redirect(REGISTER_PAGE, ERROR);
     }
 
     /*
         3. Wyciągnięcie z nowo utworzonego rekordu id_usera
     */
 
-    $query = 'SELECT * FROM `portal`.`users` WHERE nick=\''.$nick.'\'';
+    $query = 'SELECT * FROM `users` WHERE nick=\''.$nick.'\'';
 
     $result = mysqli_query($connection, $query);
 
@@ -102,8 +92,7 @@
     if(!$result)
     {
         mysqli_close($connection);
-        header('Location: register_form.php?message=other_error');
-        exit();
+        redirect(REGISTER_PAGE, ERROR);
     }
 
     $row = array();
@@ -117,8 +106,7 @@
     {
         // Błąd - znaleziono więcej niz jeden rekord uzytkownika o takim nicku, lub nie znaleziono zadnego (nie powinien wystąpić)
         mysqli_close($connection);
-        header('Location: register_form.php?message=other_error');
-        exit();
+        redirect(REGISTER_PAGE, ERROR);
     }
 
     $user_id = $row['user_id'];
@@ -135,7 +123,7 @@
 	/*
 		WAŻNE!!!
 		Odkomentować właściwą zmienną $activate_url w zależności od systemu operacyjnego na którym zainstalowany jest pakiet XAMPP
-		W systemach UNIX-owych zastąpić <adres_ip> właściwym adresem IP wirtualnego serwera
+		W systemach UNIX-owych zastąpić <adres_ip> właściwym adresem IP maszyny wirtualnej, na której stoi serwer
 	*/
 	
 	$activate_url = 'localhost/rekrutacja/activate.php?user_id='.$user_id; // W pakiecie XAMPP na Windowsie
@@ -173,15 +161,12 @@
     $mail_result = mail($email, 'Aktywacja konta', $mail_content, $content_type);
 
     if(!$mail_result)
-    {
-        header("Location: register_form.php?message=mail_error");
-        exit();
-    }
+        redirect(REGISTER_PAGE, ERROR);
 
     /*
         5. Przekierowanie na stronę rejestracji
     */
 
-    header("Location: register_form.php?message=check_inbox");
+    redirect(REGISTER_PAGE, CHECK_INBOX);
 
 ?>
