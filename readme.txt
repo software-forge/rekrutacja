@@ -1,1 +1,1 @@
-Plik readme dla projektu rekrutacyjnego.
+Plik readme dla projektu rekrutacyjnego - TODO

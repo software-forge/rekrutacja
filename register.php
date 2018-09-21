@@ -1,12 +1,12 @@
 <?php
 
     /*
-        Skrypt implementujący logikę dodawania nowego uzytkownika
+        Skrypt implementujący logikę dodawania nowego użytkownika
     */
 
 	require('redirect.php');
 	
-    // Przekierowanie do index.php, jezeli POST-em nic nie przyszło
+    // Przekierowanie do index.php, jeżeli POST-em nic nie przyszło
     if(!isset($_POST['email']) or !isset($_POST['nick']) or !isset($_POST['password']))
     {
         header('Location: index.php');
@@ -49,7 +49,7 @@
         redirect(REGISTER_PAGE, ERROR);
     }
 
-    // Taki uzytkownik juz istnieje w bazie -> przekierowanie do register.php
+    // Taki użytkownik juz istnieje w bazie -> przekierowanie do register.php
     if(mysqli_num_rows($result) > 0)
     {
         mysqli_close($connection);
@@ -63,7 +63,7 @@
     // 2.1 Zahashowanie hasła
     $password_hash = password_hash($pass, PASSWORD_DEFAULT);
 
-    // 2.2 Dodanie rekordu usera do tabeli (na razie is_active = false)
+    // 2.2 Dodanie rekordu usera do tabeli (na razie is_active = 0)
     $query = 'INSERT INTO `users` 
         (`user_id`,
         `nick`,
@@ -104,7 +104,7 @@
     }
     else
     {
-        // Błąd - znaleziono więcej niz jeden rekord uzytkownika o takim nicku, lub nie znaleziono zadnego (nie powinien wystąpić)
+        // Błąd - znaleziono więcej niż jeden rekord uzytkownika o takim nicku, lub nie znaleziono zadnego (nie powinien wystąpić)
         mysqli_close($connection);
         redirect(REGISTER_PAGE, ERROR);
     }
@@ -139,18 +139,24 @@
                                     }
                                     .hyperlink
                                     {
-                                        color: blue;
+                                        color: darkgrey;
+										text-decoration: none;
                                     }
                                     .hyperlink:hover
                                     {
-                                        color: blue;
-                                        background-color: lime;
+                                        color: lightgrey;
+                                        text-decoration: underline;
+                                    }
+									.hyperlink:visited
+                                    {
+                                        color: darkgrey;
+										text-decoration: none;
                                     }
                                 </style>
                             </head>
                             <body>
                                 <div class="main-content">
-                                    <p>Aby aktywować konto, kliknij w ponizszy link:</p>
+                                    <p>Aby aktywować konto, kliknij w poniższy link:</p>
                                     <a class="hyperlink" href="'.$activate_url.'">Aktywuj konto</a>
                                 </div>
                             </body>

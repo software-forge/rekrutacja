@@ -1,25 +1,26 @@
 <?php
 
     /*
-        Skrypt implementujący logikę aktywacji konta uzytkownika
+        Skrypt implementujący logikę aktywacji konta użytkownika
     */
 
     session_start();
 
-    // Jezeli nieustawiona zmienna 'user_id' - przekierowanie do index.php
+    // Jeżeli nieustawiona zmienna 'user_id' - przekierowanie do index.php
     if(!isset($_GET['user_id']))
         header('Location: index.php');
     
     $user_id = $_GET['user_id'];
 
     /*
-        1. Sprawdzenie, czy w bazie jest uzytkownik o takim user_id, jezeli jest to zalogowanie go (ustawienie zmiennych sesji)
+        1. Sprawdzenie, czy w bazie jest uzytkownik o takim user_id, jeżeli jest to zalogowanie go
     */
 
     require('db_credentials.php');
 
     $connection = mysqli_connect($db_servername, $db_username, $db_password, $db_name);
 
+	// Błąd połączenia z bazą -> wyświetlenie komunikatu
     if(!$connection)
     {
         echo('Błąd połączenia z bazą: '.mysqli_errno($connection));
@@ -30,6 +31,7 @@
 
     $result = mysqli_query($connection, $query);
 
+	// Błąd zapytania -> wyświetlenie komunikatu
     if(!$result)
     {
         mysqli_close($connection);
@@ -37,9 +39,10 @@
         exit();
     }
 
-    if(mysqli_num_rows($result) == 1)
+	// Znaleziono użytkownika o takim user_id (sytuacja prawidłowa)
+    if(mysqli_num_rows($result) > 0)
     {
-        // zalogowanie uzytkownika
+        // Zalogowanie użytkownika
 
         $_SESSION['logged_in'] = true;
 
@@ -50,7 +53,7 @@
     }
     else
     {
-        // Błąd - znaleziono więcej niz jednego uzytkownika o podanym user_id, lub nie znaleziono zadnego (nie powinien wystąpić)
+        // Błąd - nie znaleziono użytkownika o podanym user_id (nie powinien wystąpić)
         mysqli_close($connection);
         echo('Nie udało się aktywować konta - błędne user_id');
         exit();
@@ -63,15 +66,15 @@
     $query = 'UPDATE `users` SET `is_active` = \'1\' WHERE `users`.`user_id` = '.$user_id;
 
     $result = mysqli_query($connection, $query);
+	
+	mysqli_close($connection);
 
+	// Błąd zapytania -> wyświetlenie komunikatu
     if(!$result)
     {
-        mysqli_close($connection);
         echo('Nie udało się aktywować konta - błąd zapytania do bazy: '.mysqli_errno($connection));
         exit();
     }
-
-    mysqli_close($connection);
 
     /*
          3. Przekierowanie do index.php z komunikatem "Dziękujemy za aktywację"

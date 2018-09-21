@@ -13,18 +13,18 @@
         <title>Rejestracja</title>
         <link href="styles.css" rel="stylesheet" type="text/css"/>
     </head>
-    <body>
+    <body class="body">
     <div class="form">
             <h3>Rejestracja</h3>
             <hr>
                 <form action="register.php" method="post">
-                    E-Mail: <input type="text" name="email"/>
-                    <br><br>
-                    Nick: <input type="text" name="nick"/>
-                    <br><br>
-                    Hasło: <input type="password" name="password"/>
-                    <br><br>
-                    <input type="submit" value="Zarejestruj"/>
+					<input type="text" name="email" class="input-field" placeholder="Adres e-mail"/>
+					<br><br>
+					<input type="text" name="nick" class="input-field" placeholder="Nick"/>
+					<br><br>
+					<input type="password" name="password" class="input-field" placeholder="Hasło"/>
+					<br><br>
+                    <input type="submit" value="Zarejestruj" class="form-button"/>
                 </form>
                 <?php
                     if($message === 'invalid_email')

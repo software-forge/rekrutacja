@@ -30,10 +30,11 @@
     <head>
         <meta charset="utf-8"/>
         <title>Strona główna</title>
+		<link href="styles.css" rel="stylesheet" type="text/css"/>
     </head>
-    <body>
+    <body class="body">
         <?php
-            echo('Zalogowano jako '.$nick.' <a href="logout.php">[WYLOGUJ]</a>');
+            echo('Zalogowano jako: '.$nick.' <a href="logout.php" class="hyperlink">[WYLOGUJ]</a>');
             echo($message);
         ?>
     </body>
